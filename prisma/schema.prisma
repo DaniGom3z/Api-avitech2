@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Vacuna {
+  id     Int    @id @default(autoincrement())
+  nombre   String
+  precio  Float
+  cantidad Int
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  name    String
+  password  String
+  email    String
+  createdAt DateTime @default(now())
+}
+
+model Consumo_de_agua {
+  id    Int      @id @default(autoincrement())
+  cantidad Float
+  fecha   DateTime
+}
+
+model Pesos {
+  id    Int      @id @default(autoincrement())
+  peso    Float
+  fecha      DateTime @default(now())
+  pollosPesados Int
+  ganancia  Ganancia[]
+}
+
+model Consumo_de_alimento {
+  id         Int        @id @default(autoincrement())
+  cantidad Float
+  fecha DateTime
+}
+
+model Alimentos {
+  id                   Int                   @id @default(autoincrement())
+  nombre               String
+  precio                Float
+  cantidad               Int
+  fechaInicial          DateTime?
+  fechaFinal            DateTime?
+  createdAt            DateTime              @default(now())
+  updateAt             DateTime?              @default(now())
+  ganancias             Ganancia[]
+}
+
+model Ganancia {
+  id          Int        @id @default(autoincrement())
+  peso        Pesos      @relation(fields: [pesoId], references: [id])
+  pesoId      Int
+  alimento    Alimentos  @relation(fields: [alimentoId], references: [id])
+  alimentoId  Int
+  total       Float
+}
