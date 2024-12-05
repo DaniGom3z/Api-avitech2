@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import mqtt from 'mqtt';
+import { procesarEnWorker } from './workerService.js';  // Importa la función de worker
 
 const initMqttSocketService = (server) => {
     // Configurar Socket.IO
@@ -26,13 +27,17 @@ const initMqttSocketService = (server) => {
         });
     });
 
-    mqttClient.on('message', (topic, message) => {
+    mqttClient.on('message', async (topic, message) => {
         try {
             const datos = JSON.parse(message.toString());
             console.log(`Datos recibidos en ${topic}:`, datos);
 
-            // Emitir datos al frontend
-            io.emit('sensorData', datos);
+            // Procesar los datos en un worker
+            const resultado = await procesarEnWorker(datos);
+            console.log('Resultado del procesamiento:', resultado);
+
+            // Emitir el resultado procesado al frontend
+            io.emit('sensorData', resultado);
         } catch (error) {
             console.error('Error al procesar el mensaje:', error);
         }
